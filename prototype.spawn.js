@@ -14,7 +14,6 @@ module.exports = function()
 
     Spawn.prototype.spawnUnitByEnergy = function (unitName, energy)
     {
-      log.p('spawning with energy, energy = '+energy)
     	let debug = false;
     	let parts = [];
     	let name;

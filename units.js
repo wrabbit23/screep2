@@ -20,9 +20,9 @@ module.exports =
 			}
 		],
 		"memory": {
-      "role" : null
-      "job" : null
-      "jobTarget" : null
+      "role" : null,
+      "job" : null,
+      "jobTarget" : null,
       "energySource" : null
 		}
 	},
@@ -41,9 +41,9 @@ module.exports =
 			}
 		],
 		"memory": {
-			"role": "hauler"
-      "job" : null
-      "jobTarget" : null
+			"role": "hauler",
+      "job" : null,
+      "jobTarget" : null,
       "energySource" : null
 		}
 	}

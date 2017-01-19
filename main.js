@@ -5,6 +5,7 @@ require('prototype.room')();
 require('prototype.source')();
 require('prototype.spawn')();
 
+require("constants");
 //
 //
 global.lib = require("lib");
@@ -26,11 +27,6 @@ module.exports.loop = function () {
     if (room.isMine()) {
       roomController.run(room);
     }
-  };
-
-  for (var name in Game.creeps) {
-      var creep = Game.creeps[name];
-      creepController.run(creep);
   };
 
 }
