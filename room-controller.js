@@ -8,7 +8,9 @@ var roomController = {
       roomCreeps = room.getCreeps();
 
       //decide on population needs
-      if (roomCreeps.length<1) {
+      creepNeed = _.sum(room.getCreepNeed());
+
+      if (roomCreeps.length<creepNeed) {
         Game.getObjectById(room.memory.cache.structures.spawn[0]).spawnUnitByEnergy('worker', room.getSpawnEnergy().energy)
       }
 

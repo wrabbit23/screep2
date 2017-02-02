@@ -15,6 +15,12 @@ global.units = require("units");
 //
 global.creepController = require("creep-controller");
 global.roomController = require("room-controller");
+global.roleHarvester = require("role-harvester")
+global.roleUpgrader = require("role-upgrader")
+global.roleBuilder = require("role-builder")
+global.behaviorEnergy = require("behavior-energy")
+global.behaviorUpgrade = require("behavior-upgrade")
+global.behaviorBuild = require("behavior-build")
 
 //
 //=============---------

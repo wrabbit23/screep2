@@ -15,16 +15,25 @@ module.exports = function()
   	this.updateStructureCache(forceRefresh);
   	this.updateSourceCache(forceRefresh);
 //  	this.updateDroppedCache(forceRefresh);
-//  	this.updateUnitCache();
+  	this.updateUnitCache();
 //  	this.updateFlagCache(forceRefresh);
   };
 
 //
 //
 
+Room.prototype.updateUnitCache = function () {
+			let roomCreeps = this.getCreeps();
+
+			// build room assigned cache
+			this.memory.cache.creeps = {};
+			this.memory.cache.creeps.roles = _.groupBy(roomCreeps, (o) => {
+				return o.memory.role;
+			});
+};
+
 Room.prototype.updateStructureCache = function (forceRefresh = false)
 {
-  console.log('updating structures')
 	// insure the memory object exists
 	if (lib.isNull(this.memory.cache.structures))
 	{
@@ -95,7 +104,7 @@ Room.prototype.updateStructureCache = function (forceRefresh = false)
   if (forceRefresh)
   {
   	let foundSources = this.find(FIND_SOURCES);
-  	console.log(`Found: ${foundSources}`);
+//  	console.log(`Found: ${foundSources}`);
 
   	// map structure ids to the memory object
   	this.memory.cache.sources = _.map(foundSources, function (s) {
@@ -106,7 +115,7 @@ Room.prototype.updateStructureCache = function (forceRefresh = false)
   };
 
   //==-----
-  //
+  // Returns all creeps which this room is responsible for
   //
   Room.prototype.getCreeps = function ()
   {
@@ -116,6 +125,15 @@ Room.prototype.updateStructureCache = function (forceRefresh = false)
       return creep.room.name === roomName;
     });
     return result;
+  }
+
+  Room.prototype.getCreepNeed = function()
+  {
+    if (lib.isNull(this.memory.creepNeed))
+    {
+      this.memory.creepNeed=defaultCreepNeed;
+    }
+    return this.memory.creepNeed;
   }
 
 
