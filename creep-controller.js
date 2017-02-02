@@ -3,6 +3,13 @@ var creepController = {
     /** @param {Creep} creep **/
     run: function(creep) {
 
+    //Clearing non-existing creep memory:
+    for (var name in Memory.creeps) {
+        if (!Game.creeps[name]) {
+            delete Memory.creeps[name];
+        }
+    }
+
     //check for a role
     if (!creep.memory.role) this.assignRole(creep);
     else if (creep.memory.role=='harvester') roleHarvester.run(creep);
