@@ -1,38 +1,89 @@
 // screep2
 //
 //
-require('prototype.room')();
-require('prototype.source')();
-require('prototype.spawn')();
+"use strict";
 
-require("constants");
-//
-//
-global.lib = require("lib");
-global.units = require("units");
 
-//
-//
-global.creepController = require("creep-controller");
-global.roomController = require("room-controller");
-global.roleHarvester = require("role-harvester")
-global.roleUpgrader = require("role-upgrader")
-global.roleBuilder = require("role-builder")
-global.behaviorEnergy = require("behavior-energy")
-global.behaviorUpgrade = require("behavior-upgrade")
-global.behaviorBuild = require("behavior-build")
+/***********************************************************************************************************************
+ * Start global timers
+ */
+global.timer = require("timer");
+timer.first(true);
 
-//
-//=============---------
-module.exports.loop = function () {
+/***********************************************************************************************************************
+ * game prototypes
+ */
+require('Creep.prototype');
+require('Source.prototype');
+require('Room.prototype');
+require('RoomPosition.prototype');
+require('Spawn.prototype');
+require('StructureContainer.prototype');
+require('StructureController.prototype');
+require('StructureStorage.prototype');
+require('StructureTower.prototype');
 
-  console.log('we live');
+/***********************************************************************************************************************
+ * globals
+ */
+require("globals");
 
-  for (var name in Game.rooms) {
-    var room = Game.rooms[name];
-    if (room.isMine()) {
-      roomController.run(room);
-    }
-  };
+// global start --------------------------------------------------------------------------------------------------------
+cpuManager.log(`>>>> Global Start : ${Game.time} <<<<`);
 
-}
+cacheManager.init();
+
+// main loop -----------------------------------------------------------------------------------------------------------
+	module.exports.loop = function ()
+	{
+		timer.first();
+		timer.start( 'module.exports.loop()' );
+		//delete Memory.rooms[undefined]; // WTF WHY IS THIS HAPPENING!!!
+
+		let active = false;
+		let cpuMode = cpuManager.getThrottleMode();
+
+		// cpu throttle
+		active = cpuManager.getCPUActive(cpuMode);
+
+		//--------------------------------------------------------------------------------------------------------------
+		// Do stuffs
+		cleanupMemory();
+		if (active)
+		{
+			// loop over rooms and run the roomController
+			for (let name in Game.rooms) {
+				let room = Game.rooms[name];
+				if (room.isMine) {
+					room.update();
+					roomController.run(room);
+				}
+			}
+		}
+
+		//--------------------------------------------------------------------------------------------------------------
+		// END
+		cpuManager.tickTrack();
+		timer.stop( 'module.exports.loop()' );
+		timer.last();
+	};
+
+	/**
+	 * Deletes memory for creeps that do not exist.
+	 */
+	function cleanupMemory ()
+	{
+		timer.start("main.cleanupMemory()");
+		_.forEach(Memory.creeps, (m, c) =>
+		{
+			if (Game.creeps[c] === undefined)
+			{
+				let mem = Memory.creeps[c];
+				if (mem !== undefined)
+				{
+					delete Memory.creeps[c];
+				}
+			}
+		});
+		timer.stop("main.cleanupMemory()");
+	};

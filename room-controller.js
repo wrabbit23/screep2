@@ -1,25 +1,24 @@
-var roomController = {
+"use strict";
 
-    /** @param {Room} room **/
-    run: function(room) {
+module.exports = {
+		/** @param {Room} room **/
+		run: function (room) {
 
-      //init the memory cache
-      room.initMemCache(true);
-      roomCreeps = room.getCreeps();
+			//init the memory cache
+			let roomCreeps = Room.getCreeps(room.name);
 
-      //decide on population needs
-      creepNeed = _.sum(room.getCreepNeed());
+			//decide on population needs
+			let creepNeed = _.sum(room.getCreepNeed());
 
-      if (roomCreeps.length<creepNeed) {
-        Game.getObjectById(room.memory.cache.structures.spawn[0]).spawnUnitByEnergy('worker', room.getSpawnEnergy().energy)
-      }
+			if (roomCreeps.length < creepNeed) {
+				Game.getObjectById(room.memory.cache.structures.spawn[0]).spawnUnitByEnergy('worker', room.energyAvailable);
+			}
 
-      //run creeps in the room
-      for (var name in roomCreeps) {
-          var creep = roomCreeps[name];
-          creepController.run(creep);
-      };
+			//run creeps in the room
+			for (let name in roomCreeps) {
+				let creep = roomCreeps[name];
+				creepController.run(creep);
+			}
+		}
+};
 
-  }
-}
-module.exports = roomController;
