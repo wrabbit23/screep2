@@ -6,14 +6,15 @@ global.diplomacyManager = require("diplomacyManager");
 global.lib = require("lib");
 global.logging = require("logging");
 
-global.creepController = require("creep-controller");
-global.roomController = require("room-controller");
-global.roleHarvester = require("role-harvester");
-global.roleUpgrader = require("role-upgrader");
-global.roleBuilder = require("role-builder");
-global.behaviorEnergy = require("behavior-energy");
-global.behaviorUpgrade = require("behavior-upgrade");
-global.behaviorBuild = require("behavior-build");
+global.roleSupplier = require("roleSupplier");
+global.roleUpgrader = require("roleUpgrader");
+global.roleBuilder = require("roleBuilder");
+global.roleBuilder = require("roleBuilder");
+global.roleMaintainer = require("roleMaintainer");
+global.behaviorEnergy = require("behaviorEnergy");
+global.behaviorUpgrade = require("behaviorUpgrade");
+global.behaviorBuild = require("behaviorBuild");
+global.behaviorMaintain = require("behaviorMaintain");
 
 // settings
 global.config = require("config");
@@ -33,6 +34,7 @@ global.STRUCTURES = [STRUCTURE_SPAWN , STRUCTURE_EXTENSION , STRUCTURE_ROAD , ST
 	STRUCTURE_LAB , STRUCTURE_TERMINAL , STRUCTURE_CONTAINER , STRUCTURE_NUKER];
 
 // anon functions
-global.af = {};
-global.af.goid = id => Game.getObjectById( id );
-global.af.ogoid = o => Game.getObjectById( o.id );
+global.af = {
+	goid: id => Game.getObjectById( id ),
+	ogoid: o => Game.getObjectById( o.id ),
+};

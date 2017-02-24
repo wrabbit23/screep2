@@ -34,56 +34,53 @@ cpuManager.log(`>>>> Global Start : ${Game.time} <<<<`);
 cacheManager.init();
 
 // main loop -----------------------------------------------------------------------------------------------------------
-	module.exports.loop = function ()
-	{
-		timer.first();
-		timer.start( 'module.exports.loop()' );
-		//delete Memory.rooms[undefined]; // WTF WHY IS THIS HAPPENING!!!
+module.exports.loop = function () {
+	timer.first();
+	timer.start('module.exports.loop()');
+	//delete Memory.rooms[undefined]; // WTF WHY IS THIS HAPPENING!!!
 
-		let active = false;
-		let cpuMode = cpuManager.getThrottleMode();
+	let active = false;
+	let cpuMode = cpuManager.getThrottleMode();
 
-		// cpu throttle
-		active = cpuManager.getCPUActive(cpuMode);
+	// cpu throttle
+	active = cpuManager.getCPUActive(cpuMode);
 
-		//--------------------------------------------------------------------------------------------------------------
-		// Do stuffs
-		cleanupMemory();
-		if (active)
-		{
-			// loop over rooms and run the roomController
-			for (let name in Game.rooms) {
-				let room = Game.rooms[name];
-				if (room.isMine) {
-					room.update();
-					roomController.run(room);
-				}
+	//--------------------------------------------------------------------------------------------------------------
+	// Do stuffs
+	cleanupMemory();
+	if (active) {
+		// update caches
+		Room.buildCreepCache();
+
+		// loop over rooms and run the roomController
+		for (let name in Game.rooms) {
+			let room = Game.rooms[name];
+			if (room.isMine) {
+				room.update();
+				room.run();
 			}
 		}
+	}
 
-		//--------------------------------------------------------------------------------------------------------------
-		// END
-		cpuManager.tickTrack();
-		timer.stop( 'module.exports.loop()' );
-		timer.last();
-	};
+	//--------------------------------------------------------------------------------------------------------------
+	// END
+	cpuManager.tickTrack();
+	timer.stop('module.exports.loop()');
+	timer.last();
+};
 
-	/**
-	 * Deletes memory for creeps that do not exist.
-	 */
-	function cleanupMemory ()
-	{
-		timer.start("main.cleanupMemory()");
-		_.forEach(Memory.creeps, (m, c) =>
-		{
-			if (Game.creeps[c] === undefined)
-			{
-				let mem = Memory.creeps[c];
-				if (mem !== undefined)
-				{
-					delete Memory.creeps[c];
-				}
+/**
+ * Deletes memory for creeps that do not exist.
+ */
+function cleanupMemory() {
+	timer.start("main.cleanupMemory()");
+	_.forEach(Memory.creeps, (m, c) => {
+		if (Game.creeps[c] === undefined) {
+			let mem = Memory.creeps[c];
+			if (mem !== undefined) {
+				delete Memory.creeps[c];
 			}
-		});
-		timer.stop("main.cleanupMemory()");
-	};
+		}
+	});
+	timer.stop("main.cleanupMemory()");
+};

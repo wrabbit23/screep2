@@ -1,14 +1,46 @@
 "use strict";
 
+Room.prototype.run = function () {
+	timer.start("Room.prototype.run()");
+	console.log(`room-controller.run(): ${this.name}`);
+	//init the memory cache
+	let roomCreeps = Room.getCreeps(this.name);
+
+	//decide on population needs
+	let creepNeed = _.sum(this.getCreepNeed());
+
+	// if we have less creeps than we need, spawn one
+	if (roomCreeps.length < creepNeed) {
+		Game.getObjectById(this.memory.cache.structures.spawn[0]).spawnUnitByEnergy('worker', this.energyAvailable);
+	}
+
+	console.log(`room-controller.run(): ${this.name} Creeps: ${roomCreeps.length} Needed: ${creepNeed}`);
+
+	//run creeps in the room
+	for (let name in roomCreeps) {
+		let creep = roomCreeps[name];
+		creep.run();
+	}
+	timer.stop("Room.prototype.run()");
+};
+
 /**
  *
  * @returns {module.exports.defaultCreepNeed|{harvester, upgrader, builder, maintainer}|*}
  */
 Room.prototype.getCreepNeed = function () {
-	if (lib.isNull(this.memory.creepNeed)) {
-		this.memory.creepNeed = config.defaultCreepNeed;
+	let wallHP = config.wallHP[Room.getControllerLevel(this.name)];
+	let structuresNoWall = Room.getStructuresType(this.name , STRUCTURE_ALL_NOWALL);
+	let noWallRepairSites = _.filter(structuresNoWall , (s) => s.hits < (s.hitsMax * config.repairFactor));
+	let structuresWall = Room.getStructuresType(this.name , STRUCTURE_ALL_WALL);
+	let wallRepairSites = _.filter(structuresWall , (s) => s.hits < (wallHP * config.repairFactor));
+	let repairSites = [...noWallRepairSites, ...wallRepairSites];
+	return {
+		supplier: 2,
+		builder: lib.clamp(Room.getConstructionIds(this.name).length, 0 , 4),
+		maintainer: lib.clamp(repairSites.length, 0, 4),
+		upgrader: 5,
 	}
-	return this.memory.creepNeed;
 };
 
 
@@ -387,7 +419,7 @@ Room.buildCreepCache = function () {
 
 	_.forEach(Game.creeps, creep => {
 		let c = global.cache;
-		let cmrm = creep.memory.motive.room;
+		let cmrm = creep.memory.room;
 		let cmhR = creep.memory.homeRoom;
 		let cmr = creep.memory.role;
 		let cmu = creep.memory.unit;
@@ -715,6 +747,15 @@ Room.getRoleCreeps = function (roomName, roleName) {
 	return _.get(global, `cache.roomRole.${roomName}.roles["${roleName}"]`, []);
 };
 
+
+/**
+ * returns a hash of roles with creeps
+ * @param roomName
+ */
+Room.getCreepsByRole = function (roomName) {
+	return _.get(global, `cache.roomRole.${roomName}.roles`, {});
+};
+
 /**
  *
  * @param roomName
@@ -747,6 +788,7 @@ if (Room.prototype.hasOwnProperty('breach') === false) {
 		}
 	});
 }
+
 if (Room.prototype.hasOwnProperty('containerEnergy') === false) {
 	Object.defineProperty(Room.prototype, "containerEnergy", {
 		get: function () {
@@ -839,6 +881,7 @@ if (Room.prototype.hasOwnProperty('isOtherOwned') === false) {
 		}
 	});
 }
+
 if (Room.prototype.hasOwnProperty('maxHarvesters') === false) {
 	Object.defineProperty(Room.prototype, "maxHarvesters", {
 		get: function () {

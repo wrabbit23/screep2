@@ -22,12 +22,5 @@ module.exports =
 		towerPowerFactor: 0.8,
 		towerFillFactor: 0.9,
 		towerRepairFactor: 1,
-
-		defaultCreepNeed: {
-			harvester: 1,
-			upgrader: 1,
-			builder: 1,
-			maintainer: 1
-		},
 	};
 

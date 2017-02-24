@@ -1,56 +1,49 @@
 "use strict";
-
-// game costs for spawning parts
-Spawn.prototype.costs = {};
-Spawn.prototype.costs[MOVE] = 50;
-Spawn.prototype.costs[WORK] = 100;
-Spawn.prototype.costs[CARRY] = 50;
-Spawn.prototype.costs[ATTACK] = 80;
-Spawn.prototype.costs[RANGED_ATTACK] = 150;
-Spawn.prototype.costs[HEAL] = 250;
-Spawn.prototype.costs[TOUGH] = 10;
-Spawn.prototype.costs[CLAIM] = 600;
-
-Spawn.prototype.spawnUnitByEnergy = function (unitName, energy)
-{
-	let debug = false;
+Spawn.prototype.spawnUnitByEnergy = function (unitName, energy) {
 	let parts = [];
-	let name;
-	let result;
 	let energyLeft = energy;
+	let energyBudget = this.room.energyCapacityAvailable;
 
-	if (units[unitName].mode == 1)
-	{
-
-		units[unitName].parts.forEach(function (part)
-		{
+	if (units[unitName].mode == 1) {
+		units[unitName].parts.forEach(function (part) {
 
 			let partEnergy = energy * part.weight;
-			let numberParts = Math.floor(partEnergy / this.costs[part.part]);
+			let numberParts = Math.floor(partEnergy / BODYPART_COST[part.part]);
 
 			if (numberParts < part.minimum)
 				numberParts = part.minimum;
-			for (let x = 0; x < numberParts; x++)
-			{
-				if (energyLeft >= this.costs[part.part])
-				{
+			for (let x = 0; x < numberParts; x++) {
+				if (energyLeft >= BODYPART_COST[part.part]) {
 					parts.push(part.part);
-					energyLeft -= this.costs[part.part];
+					energyLeft -= BODYPART_COST[part.part];
 				}
 			}
-		} , this);
-	} else if (units[unitName].mode == 2)
-	{
+		}, this);
+	} else if (units[unitName].mode == 2) {
 		parts = units[unitName].parts;
 	}
 
 	parts = this.shuffle(parts);
 
-	if(parts.length>2) {
-
-		//spawn a creep
-		let newName = this.createCreep(parts , undefined , units[unitName].memory);
-
+	if (parts.length > 2) {
+		//attempt to spawn a creep
+		let name = this.createCreep(parts, undefined, units[unitName].memory);
+		if (_.isString(name)) {
+			let creep = Game.creeps[name];
+			creep.memory.room = this.room.name;
+			creep.memory.homeRoom = this.room.name;
+			creep.memory.spawn = this.name;
+			creep.memory.spawnTime = Game.time;
+			//creep.memory.job = null;
+			//creep.memory.jobTarget = null;
+			//creep.memory.energySource =  null;
+			console.log(`Spawn Status ++ ${roomLink(this.room.name)} Creating creep: ${name} energy: ${energy} energyBudget: ${energyBudget}`);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	} else {
 
 		//console.log('not enough energy to spawn, only '+parts.length+' parts');
@@ -59,25 +52,27 @@ Spawn.prototype.spawnUnitByEnergy = function (unitName, energy)
 	}
 };
 
-Spawn.prototype.shuffle = function(body) {
-	if(body == undefined)
+Spawn.prototype.shuffle = function (body) {
+	if (body == undefined)
 		return undefined;
 	return _(body)
-		.sortBy(function(part) {
-			if(part === TOUGH)
+		.sortBy(function (part) {
+			if (part === TOUGH)
 				return 0;
-			else if(part === HEAL)
+			else if (part === HEAL)
 				return BODYPARTS_ALL.length;
 			else
-				return _.random(1,BODYPARTS_ALL.length-1);
+				return _.random(1, BODYPARTS_ALL.length - 1);
 		})
 		.value();
 };
 
-Spawn.prototype.processVisuals = function() {
-	if ( this.room.visual === undefined )  {  return;  }
+Spawn.prototype.processVisuals = function () {
+	if (this.room.visual === undefined) {
+		return;
+	}
 
-	if ( this.spawning !== null ) {
+	if (this.spawning !== null) {
 		let options = {
 			color: '#00FF00',
 			size: 0.425,
@@ -90,7 +85,7 @@ Spawn.prototype.processVisuals = function() {
 			this.pos.y + 1.2,
 			options
 		).text(
-			( Game.creeps[ this.spawning.name ] === undefined ) ? '' : '[' + Game.creeps[ this.spawning.name ].bodyStringCompressed + ']',
+			( Game.creeps[this.spawning.name] === undefined ) ? '' : '[' + Game.creeps[this.spawning.name].bodyStringCompressed + ']',
 			this.pos.x,
 			this.pos.y + 1.7,
 			options
@@ -101,8 +96,8 @@ Spawn.prototype.processVisuals = function() {
 			options
 		)
 	}
-	if ( this.room.energyAvailable < this.room.energyCapacityAvailable ) {
-		this.room.visual.text (
+	if (this.room.energyAvailable < this.room.energyCapacityAvailable) {
+		this.room.visual.text(
 			this.room.energyAvailable + '/' + this.room.energyCapacityAvailable,
 			this.pos.x,
 			this.pos.y - 1.5,
@@ -116,6 +111,5 @@ Spawn.prototype.processVisuals = function() {
 	}
 };
 
-module.exports = function ()
-{
+module.exports = function () {
 };

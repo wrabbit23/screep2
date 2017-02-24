@@ -41,7 +41,7 @@ global.roomLink = function (roomArg)
  */
 global.wallStatus = function ()
 {
-	var string = "===== Wall Status =====\n";
+	let string = "===== Wall Status =====\n";
 
 	// can modify this function to take advantage of your own structure caching
 	function getRoomStructuresByType (room)
@@ -129,18 +129,18 @@ global.getId = function ()
  */
 global.makeButton = function (id , type , text , command , browserFunction = false)
 {
-	var outstr = ``;
-	var handler = ``;
+	let outstr = ``;
+	let handler = ``;
 	if (browserFunction)
 	{
-		outstr += `<script>var bf${id}${type} = ${command}</script>`;
+		outstr += `<script>let bf${id}${type} = ${command}</script>`;
 		handler = `bf${id}${type}()`
 	}
 	else
 	{
 		handler = `customCommand${id}${type}(\`${command}\`)`;
 	}
-	outstr += `<script>var customCommand${id}${type} = function(command) { $('body').injector().get('Connection').sendConsoleCommand(command) }</script>`;
+	outstr += `<script>let customCommand${id}${type} = function(command) { $('body').injector().get('Connection').sendConsoleCommand(command) }</script>`;
 	outstr += `<input type="button" value="${text}" style="background-color:#555;color:white;" onclick="${handler}"/>`;
 	return outstr;
 };
@@ -152,10 +152,10 @@ global.makeButton = function (id , type , text , command , browserFunction = fal
  */
 global.roomLevels = function ()
 {
-	var gclString = `===== GCL =====`;
-	var gclPercentage = ((Game.gcl.progress / Game.gcl.progressTotal) * 100.0).toFixed(2)
+	let gclString = `===== GCL =====`;
+	let gclPercentage = ((Game.gcl.progress / Game.gcl.progressTotal) * 100.0).toFixed(2)
 	gclString += `\n\tLEVEL: ${Game.gcl.level}\tprogress: ${gclPercentage} %\t<progress value="${Game.gcl.progress}" max="${Game.gcl.progressTotal}"></progress>`;
-	var string = "\n===== Room Levels =====";
+	let string = "\n===== Room Levels =====";
 
 	// \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 	// change the contents of these 2 functions to take advantage of your own caching
