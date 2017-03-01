@@ -4,7 +4,7 @@ module.exports = {
 
 	/** @param {Creep} creep **/
 	run: function (creep) {
-
+		timer.start("roleMaintainer.run()");
 		//build if you can, harvest if you must
 		if (creep.memory.repairing) {
 			if (creep.energy > 0) {
@@ -22,5 +22,6 @@ module.exports = {
 				behaviorEnergy.harvest(creep);
 			}
 		}
+		timer.stop("roleMaintainer.run()");
 	}
 };

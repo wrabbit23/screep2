@@ -2,19 +2,22 @@
 
 Room.prototype.run = function () {
 	timer.start("Room.prototype.run()");
-	console.log(`room-controller.run(): ${this.name}`);
+	//console.log(`room-controller.run(): ${this.name}`);
 	//init the memory cache
 	let roomCreeps = Room.getCreeps(this.name);
 
 	//decide on population needs
-	let creepNeed = _.sum(this.getCreepNeed());
+	let creepNeed = lib.clamp(_.sum(this.getCreepNeed()), 2, 12);
 
 	// if we have less creeps than we need, spawn one
 	if (roomCreeps.length < creepNeed) {
-		Game.getObjectById(this.memory.cache.structures.spawn[0]).spawnUnitByEnergy('worker', this.energyAvailable);
+		if (roomCreeps.length <= 2)
+			Game.getObjectById(this.memory.cache.structures.spawn[0]).spawnUnitByEnergy('worker', this.energyAvailable);
+		else
+			Game.getObjectById(this.memory.cache.structures.spawn[0]).spawnUnitByEnergy('worker', this.energyCapacityAvailable);
 	}
 
-	console.log(`room-controller.run(): ${this.name} Creeps: ${roomCreeps.length} Needed: ${creepNeed}`);
+	//console.log(`room-controller.run(): ${this.name} Creeps: ${roomCreeps.length} Needed: ${creepNeed}`);
 
 	//run creeps in the room
 	for (let name in roomCreeps) {
@@ -29,15 +32,26 @@ Room.prototype.run = function () {
  * @returns {module.exports.defaultCreepNeed|{harvester, upgrader, builder, maintainer}|*}
  */
 Room.prototype.getCreepNeed = function () {
+	timer.start("Room.prototype.getCreepNeed()");
 	let wallHP = config.wallHP[Room.getControllerLevel(this.name)];
 	let structuresNoWall = Room.getStructuresType(this.name , STRUCTURE_ALL_NOWALL);
 	let noWallRepairSites = _.filter(structuresNoWall , (s) => s.hits < (s.hitsMax * config.repairFactor));
 	let structuresWall = Room.getStructuresType(this.name , STRUCTURE_ALL_WALL);
 	let wallRepairSites = _.filter(structuresWall , (s) => s.hits < (wallHP * config.repairFactor));
 	let repairSites = [...noWallRepairSites, ...wallRepairSites];
+	let spawns = Room.getSpawns(this.name);
+	let extensions = Room.getStructuresType(this.name, STRUCTURE_EXTENSION);
+	let secondaries = Room.getStructuresType(this.name, STRUCTURE_TOWER);
+	if(this.storage instanceof StructureStorage)
+		secondaries = [...secondaries, this.storage];
+
+	let primaryDeliveryTargets = _.filter([...spawns, ...extensions ], structure => structure.energy < structure.energyCapacity);
+	let secondaryDeliveryTargets = _.filter(secondaries, structure => structure.energy < structure.energyCapacity);
+
+	timer.stop("Room.prototype.getCreepNeed()");
 	return {
-		supplier: 2,
-		builder: lib.clamp(Room.getConstructionIds(this.name).length, 0 , 4),
+		supplier: primaryDeliveryTargets.length + secondaryDeliveryTargets.length,
+		builder: lib.clamp(Room.getConstructionIds(this.name).length, 0 , 6),
 		maintainer: lib.clamp(repairSites.length, 0, 4),
 		upgrader: 5,
 	}
@@ -77,6 +91,10 @@ Room.prototype.update = function () {
 	this.updateDroppedCache(forceRefresh);
 	this.updateFlagCache(forceRefresh);
 	this.processVisuals();
+
+	this.motivateRamparts();
+	this.motivateTowers();
+	this.safeModeFailsafe();
 
 	timer.stop("Room.prototype.update()");
 };
@@ -415,7 +433,6 @@ Room.buildCreepCache = function () {
 	global.cache.homeRoomUnits = {};
 	global.cache.roomRoleUnits = {};
 	global.cache.roomRole = {};
-	global.cache.roomUnassigned = {};
 
 	_.forEach(Game.creeps, creep => {
 		let c = global.cache;
@@ -487,6 +504,22 @@ Room.buildCreepCache = function () {
 		}
 		// add creep to cache
 		c.roomRoleUnits[cmrm].roles[cmr].units[cmu].push(creep);
+
+		// c.roomRoleUnits.motivations.units ----------------------------------------------------------
+		// create room hash if needed
+		if (c.roomRole[cmrm] === undefined) {
+			c.roomRole[cmrm] = {};
+		}
+		// create motivation hash if needed
+		if (c.roomRole[cmrm].roles === undefined) {
+			c.roomRole[cmrm].roles = {};
+		}
+		if (c.roomRole[cmrm].roles[cmr] === undefined) {
+			c.roomRole[cmrm].roles[cmr] = [];
+		}
+		// add creep to cache
+		c.roomRole[cmrm].roles[cmr].push(creep);
+
 	});
 
 	timer.stop("Room.buildCreepCache()");
@@ -754,15 +787,6 @@ Room.getRoleCreeps = function (roomName, roleName) {
  */
 Room.getCreepsByRole = function (roomName) {
 	return _.get(global, `cache.roomRole.${roomName}.roles`, {});
-};
-
-/**
- *
- * @param roomName
- * @returns {string[]|T[]}
- */
-Room.getUnassignedCreeps = function (roomName) {
-	return Room.getRoleCreeps(roomName, "");
 };
 
 /***********************************************************************************************************************

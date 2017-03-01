@@ -30,3 +30,13 @@ RoomPosition.prototype.isEnclosed = function ()
 	timer.stop("RoomPosition.prototype.isEnclosed()");
 	return result;
 };
+
+/**
+ * @param goals
+ * @param opts
+ * @returns {*}
+ */
+RoomPosition.prototype.search = function (goals , opts)
+{
+	return PathFinder.search(this , goals , opts);
+};

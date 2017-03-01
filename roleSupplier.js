@@ -4,10 +4,12 @@ module.exports = {
 
 	/** @param {Creep} creep **/
 	run: function (creep) {
+		timer.start("roleSupplier.run()");
 		if (creep.memory.delivering) {
 			if (creep.carry.energy > 0) {
 				if (!behaviorEnergy.deliver(creep)) {
-					console.log(creep.name + ' cant deliver')
+					console.log(creep.name + ' cant deliver');
+					creep.role = "upgrader";
 				}
 			} else {
 				creep.memory.delivering = false;
@@ -18,5 +20,6 @@ module.exports = {
 		else {
 			creep.memory.delivering = true;
 		}
+		timer.stop("roleSupplier.run()");
 	}
 };

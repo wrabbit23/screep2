@@ -51,7 +51,6 @@ module.exports.loop = function () {
 	if (active) {
 		// update caches
 		Room.buildCreepCache();
-
 		// loop over rooms and run the roomController
 		for (let name in Game.rooms) {
 			let room = Game.rooms[name];

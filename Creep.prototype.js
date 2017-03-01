@@ -5,48 +5,42 @@ Creep.prototype.run = function () {
 
 	//check for a role
 	if (!this.memory.role) this.assignRole();
-	else if (this.memory.role == 'supplier') roleSupplier.run(this);
-	else if (this.memory.role == 'upgrader') roleUpgrader.run(this);
-	else if (this.memory.role == 'builder') roleBuilder.run(this);
+	else if (this.memory.role==='supplier') roleSupplier.run(this);
+	else if (this.memory.role==='upgrader') roleUpgrader.run(this);
+	else if (this.memory.role==='builder') roleBuilder.run(this);
+	else if (this.memory.role==='maintainer') roleMaintainer.run(this);
 
 	timer.stop("Creep.prototype.run()");
 };
 
 Creep.prototype.assignRole = function () {
 	timer.start("Creep.prototype.assignRole()");
-	console.log('assigning a role');
+
 	let roomCreeps = Room.getCreepsByRole(this.room.name);
 	let roomCreepNeed = this.room.getCreepNeed();
 
-	console.log(roomCreepNeed);
-
 	//assign supplier
 	if (!roomCreeps.supplier || roomCreeps.supplier.length < roomCreepNeed.supplier) {
-		this.memory.role = 'supplier';
-		timer.stop("Creep.prototype.assignRole()");
-		return this.memory.role;
+		this.role = 'supplier';
 	}
 	//assign builder
-	if (!roomCreeps.upgrader || roomCreeps.upgrader.length < roomCreepNeed.upgrader) {
-		this.memory.role = 'builder';
-		timer.stop("Creep.prototype.assignRole()");
-		return this.memory.role;
+	else if (!roomCreeps.builder || roomCreeps.builder.length < roomCreepNeed.builder) {
+		this.role = 'builder';
 	}
 
 	//assign maintainer
-	if (!roomCreeps.builder || roomCreeps.builder.length < roomCreepNeed.builder) {
-		this.memory.role = 'maintainer';
-		timer.stop("Creep.prototype.assignRole()");
-		return this.memory.role;
+	else if (!roomCreeps.maintainer || roomCreeps.maintainer.length < roomCreepNeed.maintainer) {
+		this.role = 'maintainer';
 	}
 
 	//assign upgrader
-	if (!roomCreeps.builder || roomCreeps.builder.length < roomCreepNeed.builder) {
-		this.memory.role = 'upgrader';
-		timer.stop("Creep.prototype.assignRole()");
-		return this.memory.role;
+	else {
+		this.role = 'upgrader';
 	}
+
+	console.log(`assigning ${this.role} role to ${this.name}`);
 	timer.stop("Creep.prototype.assignRole()");
+	return this.role;
 };
 
 /*
@@ -118,10 +112,21 @@ if (Creep.prototype.hasOwnProperty('carrying') === false) {
 	});
 }
 
-if (Creep.prototype.hasOwnProperty('unit') === false) {
-	Object.defineProperty(Creep.prototype, "unit", {
+if (Creep.prototype.hasOwnProperty('energy') === false) {
+	Object.defineProperty(Creep.prototype, "energy", {
 		get: function () {
-			return this.memory.unit;
+			return this.carry[RESOURCE_ENERGY] || 0;
+		}
+	});
+}
+
+if (Creep.prototype.hasOwnProperty('role') === false) {
+	Object.defineProperty(Creep.prototype, "role", {
+		get: function () {
+			return this.memory.role;
+		},
+		set: function (value) {
+			this.memory.role = value;
 		}
 	});
 }
@@ -134,16 +139,13 @@ if (Creep.prototype.hasOwnProperty('spawnTime') === false) {
 	});
 }
 
-if (Creep.prototype.hasOwnProperty('energy') === false)
-{
-	Object.defineProperty(Creep.prototype , "energy" , {
-		get: function ()
-		{
-			return this.carry[RESOURCE_ENERGY] || 0;
+if (Creep.prototype.hasOwnProperty('unit') === false) {
+	Object.defineProperty(Creep.prototype, "unit", {
+		get: function () {
+			return this.memory.unit;
 		}
 	});
 }
-
 
 module.exports = function () {
 };

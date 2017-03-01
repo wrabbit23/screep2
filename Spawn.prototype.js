@@ -4,7 +4,7 @@ Spawn.prototype.spawnUnitByEnergy = function (unitName, energy) {
 	let energyLeft = energy;
 	let energyBudget = this.room.energyCapacityAvailable;
 
-	if (units[unitName].mode == 1) {
+	if (units[unitName].mode===1) {
 		units[unitName].parts.forEach(function (part) {
 
 			let partEnergy = energy * part.weight;
@@ -19,7 +19,7 @@ Spawn.prototype.spawnUnitByEnergy = function (unitName, energy) {
 				}
 			}
 		}, this);
-	} else if (units[unitName].mode == 2) {
+	} else if (units[unitName].mode===2) {
 		parts = units[unitName].parts;
 	}
 
@@ -53,7 +53,7 @@ Spawn.prototype.spawnUnitByEnergy = function (unitName, energy) {
 };
 
 Spawn.prototype.shuffle = function (body) {
-	if (body == undefined)
+	if (body===undefined)
 		return undefined;
 	return _(body)
 		.sortBy(function (part) {
