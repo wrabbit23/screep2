@@ -23,6 +23,7 @@ module.exports = {
 			return true;
 		} else {
 			creep.memory.building = false;
+			creep.role = "upgrader";
 			timer.stop("behaviorBuild.build()");
 			return false;
 		}
