@@ -16,7 +16,7 @@ module.exports =
 		COLOR_YELLOW: "#AAAA00" ,
 		COLOR_RED: "#CC0011" ,
 
-		ME: "Timendainum" ,
+		ME: "LordHein" ,
 
 		ROOM_MODE_ENEMY: -53 ,
 		ROOM_MODE_KEEPER: -52 ,
