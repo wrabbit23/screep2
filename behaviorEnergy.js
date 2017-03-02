@@ -54,39 +54,41 @@ module.exports = {
 
 	//screep should aqcuire energy from storage
 	buy: function (creep) {
-		timer.start("behaviorEnergy.buy()");
-		console.log('creep buying - ' + creep.name);
 
-		let energyNeed = creep.carryCapacity - creep.carry.energy;
-		let closestContainer = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+		timer.start("behaviorEnergy.buy()");
+
+		let storage = creep.room.storage;
+		let containers = Room.getStructuresType(creep.room.name, STRUCTURE_CONTAINER);
+		let energyNeed = creep.carryCapacity - creep.carrying;
+
+		let closestContainer = creep.pos.findClosestByRange(containers, {
 			filter: (structure) => {
 
-				if (structure.structureType==='container') {
 					if (structure.energy >= energyNeed) {
-						timer.stop("behaviorEnergy.buy()");
 						return true;
 					}
-				}
-				timer.stop("behaviorEnergy.buy()");
 				return false;
 			}
 		});
 
 		if (closestContainer) {
+
 			if (creep.withdraw(closestContainer, RESOURCE_ENERGY, energyNeed)===ERR_NOT_IN_RANGE) {
 				creep.moveTo(closestContainer);
 			}
+
+		} else if (storage.energy>=energyNeed) {
+
+			if (creep.withdraw(storage, RESOURCE_ENERGY, energyNeed)===ERR_NOT_IN_RANGE) {
+				creep.moveTo(storage);
+			}
+
 		} else {
 
-			let source = Game.spawns['Spawn1'];
-			if ((source.energy > 280) && (source.energy >= energyNeed)) {
-				if (creep.withdraw(source, RESOURCE_ENERGY, energyNeed)===ERR_NOT_IN_RANGE) {
-					creep.moveTo(source);
-				}
-			} else {
-				this.harvest(creep);
-			}
+			this.harvest(creep);
+
 		}
+
 		timer.stop("behaviorEnergy.buy()");
 		return true;
 	}

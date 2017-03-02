@@ -19,7 +19,7 @@ module.exports = {
 			if (creep.energy === creep.carryCapacity) {
 				creep.memory.building = true;
 			} else {
-				behaviorEnergy.harvest(creep);
+				behaviorEnergy.buy(creep);
 			}
 		}
 		timer.stop("roleBuilder.run()");

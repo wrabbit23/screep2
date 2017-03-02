@@ -50,7 +50,7 @@ Room.prototype.getCreepNeed = function () {
 
 	timer.stop("Room.prototype.getCreepNeed()");
 	return {
-		supplier: primaryDeliveryTargets.length + secondaryDeliveryTargets.length,
+		supplier: lib.clamp(primaryDeliveryTargets.length + secondaryDeliveryTargets.length, 0, 4),
 		builder: lib.clamp(Room.getConstructionIds(this.name).length, 0 , 6),
 		maintainer: lib.clamp(repairSites.length, 0, 4),
 		upgrader: 5,

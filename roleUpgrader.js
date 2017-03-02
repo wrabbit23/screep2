@@ -29,7 +29,7 @@ module.exports = {
 			behaviorUpgrade.upgrade(creep);
 		}
 		else {
-			behaviorEnergy.harvest(creep);
+			behaviorEnergy.buy(creep);
 		}
 		timer.stop("reoleUpgrader.run()");
 	}

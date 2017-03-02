@@ -15,7 +15,7 @@ module.exports = {
 				creep.memory.delivering = false;
 			}
 		} else if (creep.carry.energy < creep.carryCapacity) {
-			behaviorEnergy.harvest(creep);
+			behaviorEnergy.buy(creep);
 		}
 		else {
 			creep.memory.delivering = true;
