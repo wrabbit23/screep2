@@ -16,7 +16,7 @@ module.exports = {
 				creep.memory.repairing = false;
 			}
 		} else {
-			if (creep.energy === creep.carryCapacity) {
+			if (creep.energy > creep.carryCapacity / 2) {
 				creep.memory.repairing = true;
 			} else {
 				behaviorEnergy.buy(creep);
