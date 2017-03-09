@@ -1041,7 +1041,7 @@ if (Room.prototype.hasOwnProperty('threat') === false) {
 						console.log("!!!> NPC THREAT! " + link);
 					}
 
-					if (this.memory.threat.level >= C.THREAT_NPC && this.memory.threat.breach) {
+					if (this.memory.threat.level >= C.THREAT_PLAYER && this.memory.threat.breach) {
 						this.memory.threat.level = C.THREAT_PANIC;
 						console.log("!!!> WALL BREACH! " + link);
 					}
