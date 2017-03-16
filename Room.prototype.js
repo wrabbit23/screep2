@@ -330,17 +330,17 @@ Room.prototype.motivateRamparts = function () {
 	else if (this.threat.threats[C.RELATION_ALLY].length > 0) {
 
 		let allies = _(this.threat.threats[C.RELATION_ALLY]).map(af.ogoid).filter().value();
-		_.forEach(allies, ally => {
+
 			_.forEach(Room.getStructuresType(this.name, STRUCTURE_RAMPART), r => {
-				let allyRange = ally.pos.getRangeTo(r);
-				if (!r.isPublic && allyRange < 2) {
-					r.setPublic(true);
-				}
-				else if (r.isPublic && allyRange > 1) {
-					r.setPublic(false);
-				}
-			});
-		});
+						if (r.pos.findInRange(allies, 1).length > 0) {
+							if (!r.isPublic) {
+								r.setPublic(true);
+							}
+						} else if (r.isPublic) {
+							r.setPublic(false);
+						}
+					});
+
 	} else if (Game.time % 10 === 0) {
 		_.forEach(Room.getStructuresType(this.name, STRUCTURE_RAMPART), r => {
 			if (r.isPublic) {
